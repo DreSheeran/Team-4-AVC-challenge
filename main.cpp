@@ -8,16 +8,22 @@ int main(){
 		int sum = 0;
 		int i;
 		int w;
+		int numWhite = 0;
 		take_picture();
-		for(i = -160; i<160; i++) {
-			w = get_pixel(i+160,120,3);
+		for(i = 0; i<320; i++) {
+			w = get_pixel(120,i,3);
 			if (w > 128) {
 				w = 1;
+				numWhite++;
 			} else {
 				w = 0;
 			}
-			sum += w*i;
+			sum += w*(i-160);
+			
 		}
+		if(numWhite == 0){
+				sum = 2147483647;
+			}
 		printf("The sum is %d\n",sum); 
 		sleep1 (0, 500000);
 		
