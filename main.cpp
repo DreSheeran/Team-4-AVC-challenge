@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "E101.h"
+#include <limits.h>
 
 int main(){
 	init();
@@ -22,7 +23,7 @@ int main(){
 			
 		}
 		if(numWhite == 0){
-				sum = 2147483647;
+				sum = INT_MAX;
 			}
 		printf("The sum is %d\n",sum); 
 		sleep1 (0, 500000);
