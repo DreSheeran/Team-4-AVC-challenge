@@ -30,13 +30,14 @@ int lineCheck() {
 }
 
 void runMotors(int error) {
-	int dimen = 250;
+	int baseSpeed = 50;
+	int dimen = 500;
 	if (error != INT_MAX) {
-		set_motor(1,-150 + error/dimen);
-		set_motor(2,150 + error/dimen);
+		set_motor(1,baseSpeed - error/dimen);
+		set_motor(2,-baseSpeed - error/dimen);
 	} else {
-		set_motor(1,1);
-		set_motor(2,1);
+		set_motor(1,-baseSpeed);
+		set_motor(2,baseSpeed);
 	}
 }
 
@@ -45,9 +46,8 @@ int main(){
 	int error = 0;
 	while(true) {
 		error = lineCheck(); 
-		printf("The error is %d\n",error);
 		runMotors(error);
-		sleep1 (0, 500000);	
+		sleep1 (0, 100000);	
 	}
 	return 0;
 }
