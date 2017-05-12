@@ -31,7 +31,7 @@ int lineCheck() {
 
 void runMotors(int error) {
 	int baseSpeed = 50;
-	int dimen = 500;
+	int dimen = 12500/30;
 	if (error != INT_MAX) {
 		set_motor(1,baseSpeed - error/dimen);
 		set_motor(2,-baseSpeed - error/dimen);
