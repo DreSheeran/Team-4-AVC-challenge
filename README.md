@@ -6,4 +6,5 @@ Team Members: Bruce,
               Andre,
               Kelvin,
               Sophie,
-              Eevin
+              Eevin,
+              Me the new guy!
