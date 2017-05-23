@@ -3,6 +3,10 @@
 #include "E101.h" 
 #include <limits.h>
 
+NICE CODE XDDDDD
+
+Remember to log out!
+
 //motor 1 - right wheel
 //motor 2 - left wheel
 
