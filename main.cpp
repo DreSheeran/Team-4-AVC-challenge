@@ -3,10 +3,6 @@
 #include "E101.h" 
 #include <limits.h>
 
-NICE CODE XDDDDD
-
-Remember to log out!
-
 //motor 1 - right wheel
 //motor 2 - left wheel
 
@@ -40,7 +36,12 @@ int lineCheck(int line) {
 
 	return sum;
 }
-
+/*
+void runMotors2(int error, int top, int bot) {
+	int dimen = 450;
+	if (error != INT_MAX)
+}
+*/
 void runMotors(int error) {
 	int dimen = 450;
 	if (error != INT_MAX) {
