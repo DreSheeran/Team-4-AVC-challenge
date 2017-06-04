@@ -3,19 +3,26 @@
 #include "E101.h" 
 #include <limits.h>
 
-//motor 1 - right wheel
-//motor 2 - left wheel
+/*
+ read_analog(0) = right
+ read_analog(1) = front
+ read_analog(7) = left
+ motor 1 - right wheel
+ motor 2 - left wheel
+*/
+
 
 bool allWhite = false;
 int baseSpeed = 50;
 int maxWhite = -1;
+double multiplier = 1.2;
 
 int lineCheck(int line) {
 	int sum = 0;
 	int i;
 	int w;
 	int numWhite = 0;
-	int whiteThresh = 100;
+	int whiteThresh = 125;
 	take_picture();
 	for(i = 0; i<320; i++) {
 		w = get_pixel(line,i,3);
@@ -36,11 +43,21 @@ int lineCheck(int line) {
 		printf("Max whites seen is %d\n",maxWhite);
 		
 	}
-	if (numWhite > 300) {
+	if (numWhite > 280) {
 		allWhite = true;
 	}
 
 	return sum;
+}
+
+int wallCheck(int type) {
+	int max = 0;
+	for(int i = 0; i < 10; i++) {
+		int cameraReading = read_analog(type);
+		max += cameraReading;
+	}
+	int average = max/10;
+	return average;
 }
 
 bool checkRed() {
@@ -74,6 +91,13 @@ void runMotors2(int error) {
 		set_motor(2,-baseSpeed - error/dimen);
 	}
 }
+
+void runMotors3(int error) {
+	int dimen = 23;
+	set_motor(1,baseSpeed + error/dimen);
+	set_motor(2,-baseSpeed + error/dimen);
+}
+
 
 void runMotors(int error) {
 	int dimen = 450;
@@ -112,6 +136,28 @@ void turnLeft() {
 		botError = lineCheck(239);
 	}
 }
+
+void turnRight2() {
+	int frontReading = INT_MAX;
+	while(frontReading > 200) {
+		set_motor(1,-baseSpeed*multiplier);
+		set_motor(2,-baseSpeed*multiplier);
+		frontReading = wallCheck(1);
+	}
+
+}
+
+void turnLeft2() {
+	int frontReading = INT_MAX;
+	while(frontReading > 200) {
+		set_motor(1,baseSpeed*multiplier);
+		set_motor(2,baseSpeed*multiplier);
+		frontReading = wallCheck(1);
+	}
+	
+}
+
+
 void openGate() {
 	char server[15] = {0};
 	sprintf(server, "130.195.6.196");
@@ -159,6 +205,31 @@ int main(){
 		sleep1(0,10000);
 		if(checkRed()) {
 			break;
+		}
+	}
+	while(true) {
+		int frontError = wallCheck(1);
+		int rightError = wallCheck(0);
+		int leftError = wallCheck(7);
+		if(checkRed() && frontError > 300) {
+			set_motor(1,2);
+			set_motor(2,2);
+			continue;
+		}
+		if(frontError > 300) {
+			if(rightError < 250) {
+				turnRight2();
+			} else if(leftError < 250) {
+				turnLeft2();
+			}
+		} else {
+			if(leftError < 100) {
+				leftError = rightError;
+			} else if(rightError < 100) {
+				rightError = leftError;
+			}
+			int error = rightError - leftError;
+			runMotors3(error);
 		}
 	}
 	set_motor(1,2);
