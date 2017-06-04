@@ -8,13 +8,14 @@
 
 bool allWhite = false;
 int baseSpeed = 50;
+int maxWhite = -1;
 
 int lineCheck(int line) {
 	int sum = 0;
 	int i;
 	int w;
 	int numWhite = 0;
-	int whiteThresh = 120;
+	int whiteThresh = 100;
 	take_picture();
 	for(i = 0; i<320; i++) {
 		w = get_pixel(line,i,3);
@@ -30,18 +31,50 @@ int lineCheck(int line) {
 	if(numWhite == 0){
 		sum = INT_MAX;
 	}
-	if (numWhite == 320) {
+	if(numWhite > maxWhite){
+		maxWhite = numWhite;
+		printf("Max whites seen is %d\n",maxWhite);
+		
+	}
+	if (numWhite > 300) {
 		allWhite = true;
 	}
 
 	return sum;
 }
-/*
-void runMotors2(int error, int top, int bot) {
-	int dimen = 450;
-	if (error != INT_MAX)
+
+bool checkRed() {
+	int line = 120;
+	int red;
+	int redThresh = 150;
+	int otherThresh = 120;
+	int numRed = 0;
+	int green;
+	int blue;
+	take_picture();
+	for(int i = 0; i<320; i++) {
+		red = get_pixel(line,i,0);
+		green = get_pixel(line,i,1);
+		blue = get_pixel(line,i,2);
+		if (red > redThresh && green < otherThresh && blue < otherThresh) {
+			numRed++;
+		}
+	}
+	if(numRed > 30) {
+		return true;
+	} else {
+		return false;
+	}
 }
-*/
+
+void runMotors2(int error) {
+	int dimen = 600;
+	if (error != INT_MAX) {
+		set_motor(1,baseSpeed - error/dimen);
+		set_motor(2,-baseSpeed - error/dimen);
+	}
+}
+
 void runMotors(int error) {
 	int dimen = 450;
 	if (error != INT_MAX) {
@@ -50,7 +83,7 @@ void runMotors(int error) {
 	} else {
 		set_motor(1,-baseSpeed);
 		set_motor(2,baseSpeed);
-		sleep1(0, 300000);
+		sleep1(0, 100000);
 	}
 }
 
@@ -110,15 +143,26 @@ int main(){
 		topError = lineCheck(1);
 		botError = lineCheck(239);
 		if(topError == INT_MAX && botError == INT_MAX) {
-			if(lastError > 8000) {
+			if(lastError > 200) {
+				printf("Right turn %d\n",lastError);
 				turnRight();
 			} else {
+				printf("Left turn %d\n",lastError);
 				turnLeft();
 			}
 		} else {
-			runMotors(error);
+			runMotors2(error);
 		}
-		sleep1 (0, 100000);
+		if (error != INT_MAX) {
+			lastError = error;
+		}
+		sleep1(0,10000);
+		if(checkRed()) {
+			break;
+		}
 	}
+	set_motor(1,2);
+	set_motor(2,2);
+	sleep1(1,0);
 	return 0;
 }
